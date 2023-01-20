@@ -101,3 +101,20 @@ Based on
  - [13]: Mohri, M., Sivek, G. and Suresh, A.T. (2019) ‘Agnostic Federated Learning’, in Proceedings of the 36th International Conference on Machine Learning. Available at: https://proceedings.mlr.press/v97/mohri19a.html
   
  - [14]: Li, T. et al. (2020) ‘Federated Learning: Challenges, Methods, and Future Directions’, IEEE Signal Processing Magazine, 37(3), pp. 50–60. Available at: https://doi.org/10.1109/MSP.2020.2975749.
+
+## Special case: Split Learning
+
+ - Split Learning is a distributed and private method for training deep neural networks developed by MIT Labs. It allows for training across multiple data sources without the need for sharing raw, labeled data directly.
+ - In split learning, a deep neural network is **split into multiple sections**, each of which is trained on a different client.
+ - The main disadvantage of FL is that each client needs to run the full ML model, and resource-constrained clients, such as available in the Internet of Things, could not afford to run the full model.
+ - SL splits the full ML model into multiple smaller network portions and train them separately on a server, and distributed clients with their local data. Assigning only a part of the network to train at the client-side reduces processing load (compared to that of running a complete network as in FL), which is significant in ML computation on resource-constrained devices
+ - The difference between SL and FL lies in the communication content between clients
+and the server. In split learning, clients are responsible for training the shallower layers of the model, and update the outputs of shallower layers to the server.
+ - [15] proposes a mix of FL and Split Learning
+- 
+ - limited literature after 2018
+
+#### Literature explaining the model
+ - didnt find the whitepaper or any other work from MIT explaining the details of the model
+ - [MIT website for the paper](https://splitlearning.mit.edu/)
+ - [15]: Thapa, C. et al. (2022) ‘SplitFed: When Federated Learning Meets Split Learning’. arXiv. Available at: http://arxiv.org/abs/2004.12088 (Accessed: 20 January 2023).
