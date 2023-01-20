@@ -6,7 +6,7 @@ Based on
 
 [2]: Chen, Y. et al. (2022) ‘Federated Learning Attacks and Defenses: A Survey’. arXiv. Available at: https://doi.org/10.48550/arXiv.2211.14952.
 
-## Data Partition
+## By Data Partition
 
 ### Horizontal FL
  - The essence of HFL is the **union of samples**. When users’ features of two datasets overlap more and users overlap less, we divide the dataset horizontally and take out the part of the data where the users’ features of both datasets are the same, but the users are not exactly the same for training (that is the user dimension). 
@@ -31,14 +31,73 @@ Based on
 
  - Pre-trained teacher models could gradually become the more attractive and vulnerable target for attackers to manipulate, so that student models that use such maliciously manipulated teacher models can incur immense threats. **#IDEA: Observing the malicious data before inherited from teacher.**
 
-#### Literature explaining the model
+##### Literature explaining the model
 [3]: Liu, Y. et al. (2020) ‘A Secure Federated Transfer Learning Framework’, IEEE Intelligent Systems, 35(4), pp. 70–82. Available at: https://doi.org/10.1109/MIS.2020.2988525.
 
 [4]: Pan, S.J. et al. (2010) ‘Cross-domain sentiment classification via spectral feature alignment’, in Proceedings of the 19th international conference on World wide web. WWW ’10: The 19th International World Wide Web Conference, Raleigh North Carolina USA: ACM, pp. 751–760. Available at: https://doi.org/10.1145/1772690.1772767.
 
 [5]: Yang, Q. et al. (2019) ‘Federated Machine Learning: Concept and Applications’. arXiv. Available at: https://doi.org/10.48550/arXiv.1902.04885.
 
-#### Literature providing attacks
+##### Literature providing attacks
  - In general, this categorization does not provide different types of attacks, as it is mainly about the data layer of the model, and not about its characteristics.
  - However, Transfer Learning has some attacks in literature, though *not in the federated setting.*
  - [6]: Wang, S. et al. (2022) ‘Backdoor Attacks Against Transfer Learning With Pre-Trained Deep Learning Models’, IEEE Transactions on Services Computing, 15(3), pp. 1526–1539. Available at: https://doi.org/10.1109/TSC.2020.3000900. (#TODO): Read in depth
+
+## By methods for solving heterogeneity
+ - Because of the variety of devices that take part in the FL process, the difference of equipment will eventually affect the training. To solve the problem of system heterogeneity, the following architectures are implemented.
+ 
+ - Synchronous aggregation fails due to its waiting for straggler devices before aggregation in each training round.
+
+### Asynchronous Federated Learning
+ - In AFL, the global model aggregation happens whenever a new local model is received by the aggregation server.
+ 
+ - **Node selection**: In AFL, it is more eager to select nodes that are more robust and powerful while preventing the global model from overfitting.
+
+ - **Weighted Aggregation**: In AFL, the goal is to mitigate the effects of stale local models generated based on an outdated global model, which does not exist in classic FL. By incorporating a staleness parameter, weighted aggregation reduces the weight of stale local models and increases the weight of the most current local models during the aggregation procedure.
+
+ - **Gradient Compression**: Since gradient compression is a general strategy to improve the efficiency of FL, it is usually adopted in AFL to further reduce communication costs. After introducing AFL, gradient compression faces new challenges of resource-constrained edge/IoT computing environment and more frequent aggregation operation.
+
+##### Literature explaining the model
+ - [7]: Xu, C. et al. (2022) ‘Asynchronous Federated Learning on Heterogeneous Devices: A Survey’. arXiv. Available at: https://doi.org/10.48550/arXiv.2109.04269.
+
+
+### Semi-Asynchronous / Cluster Federated Learning
+ - Clustered FL is an approach of increasing training efficiency by grouping together devices with similar performance, functionalities, or datasets. Inner-group update, inter-group update, or both could benefit from the asynchronous update strategy.
+
+ - Framework proposal in [8]: CSAFL. CSAFL includes several groups, which can be deployed to the central server, or some devices in the middle layer, such as the edge server
+
+##### Literature explaining the model
+ - [8]: Zhang, Y. et al. (2021) ‘CSAFL: A Clustered Semi-Asynchronous Federated Learning Framework’. 2021 International Joint Conference on Neural Networks (IJCNN), pp. 1–10. Available at: https://doi.org/10.1109/IJCNN52387.2021.9533794.
+
+### FL with Sampling
+ - In some federated learning scenarios, the equipment **is selected** to participate in the training, while in another part of the scene, the equipment **takes the initiative** to participate in the training.
+ - In [9] FedCS, mitigates the heterogenity problem while actively managing clients based on their resource conditions. Specifically, FedCS solves a client selection problem with resource constraints, which allows the server to aggregate as many client updates as possible and to accelerate performance improvement in ML models.
+ - Using incentives: in [10], they adopt the contract theory to design an effective incentive mechanism for simulating the mobile devices with high-quality (e.g., high-accuracy) data to participate in federated learning.
+
+#### Literature explaining the model
+ - [9]: Nishio, T. and Yonetani, R. (2019) ‘Client Selection for Federated Learning with Heterogeneous Resources in Mobile Edge’, in ICC 2019 - 2019 IEEE International Conference on Communications (ICC), pp. 1–7. Available at: https://doi.org/10.1109/ICC.2019.8761315.
+ - [10]: Kang, J. et al. (2019) ‘Incentive Design for Efficient Federated Learning in Mobile Networks: A Contract Theory Approach’. arXiv. Available at: https://doi.org/10.48550/arXiv.1905.07479.
+
+#### Attacks
+ - "Most privacy and robustness researches are focused on FL with homogeneous architectures. It remains unclear whether existing attacks, privacy-preserving techniques and defense mechanisms can be adapted to FL with heterogeneous architectures. It is valuable future work to explore similar types of attacks and defenses in heterogeneous FL." [11]
+ - [11]: Lyu, L. et al. (2022) ‘Privacy and Robustness in Federated Learning: Attacks and Defenses’. arXiv. Available at: http://arxiv.org/abs/2012.06337 (Accessed: 20 January 2023).
+
+
+## By data handling techniques
+
+### FL with trusted hardware
+ - Secure hardware, such as Intel-SGX and AMD enclave, provides a trusted environment for users to execute their code in an untrusted setting, even when assuming that the operating system itself may be compromised. [12]
+ - non-judicious use of cryptographic primitives can lead to leakage of information
+ - **Explanation**: At the beginning of the protocol, code is loaded into the enclaves and interested parties get a code attestation. Then, the active party’s enclave generates a key for a semantically secure symmetric encryption scheme (e.g., AES) and a secure channel is established between it and the passive parties’ enclaves. Secret keys are communicated (as necessary) via this secure channel.
+
+#### Literature explaining the model
+ - [12]: Chamani, J.G. and Papadopoulos, D. (2020) ‘Mitigating Leakage in Federated Learning with Trusted Hardware’. arXiv. Available at: https://doi.org/10.48550/arXiv.2011.04948.
+
+### Agnostic FL
+ - In [13] they propose a new framework of agnostic federated learning, where the centralized model is optimized for any target distribution formed by a mixture of the client distributions, instead of being biased towards different clients.
+ - "Optimizes the centralized model for any target distribution formed by a mixture of the client distributions via a minimax optimization scheme". [14]
+
+#### Literature explaining the model
+ - [13]: Mohri, M., Sivek, G. and Suresh, A.T. (2019) ‘Agnostic Federated Learning’, in Proceedings of the 36th International Conference on Machine Learning. Available at: https://proceedings.mlr.press/v97/mohri19a.html
+  
+ - [14]: Li, T. et al. (2020) ‘Federated Learning: Challenges, Methods, and Future Directions’, IEEE Signal Processing Magazine, 37(3), pp. 50–60. Available at: https://doi.org/10.1109/MSP.2020.2975749.
