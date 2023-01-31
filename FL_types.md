@@ -82,6 +82,24 @@ Based on
  - "Most privacy and robustness researches are focused on FL with homogeneous architectures. It remains unclear whether existing attacks, privacy-preserving techniques and defense mechanisms can be adapted to FL with heterogeneous architectures. It is valuable future work to explore similar types of attacks and defenses in heterogeneous FL." [11]
  - [11]: Lyu, L. et al. (2022) ‘Privacy and Robustness in Federated Learning: Attacks and Defenses’. arXiv. Available at: http://arxiv.org/abs/2012.06337 (Accessed: 20 January 2023).
 
+### Peer to Peer FL
+
+ - P2P FL is a distributed learning protocol without a central parameter server.
+ - Each node has a set of peer nodes with whom the node can exchange model updates.
+ - Currently there is no widely deployed P2PFL protocol or framework
+ - Absence of a central server body not only makes our environment resistant to failure but also precludes the need for a body everyone trusts. [16]
+
+
+#### Literature explaining the model
+ - [16]: Roy, A.G. et al. (2019) ‘BrainTorrent: A Peer-to-Peer Environment for Decentralized Federated Learning’. arXiv. Available at: https://doi.org/10.48550/arXiv.1905.06731.
+ - [17]: Lalitha, A. et al. (2019) ‘Peer-to-peer Federated Learning on Graphs’. arXiv. Available at: https://doi.org/10.48550/arXiv.1901.11173.
+
+
+ #### Attacks
+  - [18]: Yar, G., Nita-Rotaru, C. and Oprea, A. (2023) ‘Backdoor Attacks in Peer-to-Peer Federated Learning’. arXiv. Available at: https://doi.org/10.48550/arXiv.2301.09732.
+
+
+
 
 ## By data handling techniques
 
