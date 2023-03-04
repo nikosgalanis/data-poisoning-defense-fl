@@ -12,12 +12,20 @@ Perform label-flipping on a dataset, with a specific target
  - target_mal: the new, malicious label of the target
 """
 def generate_malicious_dataset(dataset, mal_percentage, target_honest, target_mal):
-	flipped_dataset = copy.deepcopy(dataset)
-
-	for i in tqdm(range(len(flipped_dataset))):
-    		
-		if flipped_dataset.targets[i] == target_honest:
-			prob = random.random()
-			if prob < mal_percentage:
-				flipped_dataset.targets[i] = target_mal
-	return flipped_dataset
+    # if we are indeed performing the attack
+	if mal_percentage > 0:
+    	# create a copy so we dont harm the original
+		flipped_dataset = copy.deepcopy(dataset)
+		# parse the dataset
+		for i in tqdm(range(len(flipped_dataset))):
+			# if we find the target label	
+			if flipped_dataset.targets[i] == target_honest:
+				# only flip mal% of the target labels
+				prob = random.random()
+				if prob < mal_percentage:
+					flipped_dataset.targets[i] = target_mal
+		# return the malicious dataset
+		return flipped_dataset
+	else:
+    	# if we are not launching the attack, just return the original one
+		return dataset

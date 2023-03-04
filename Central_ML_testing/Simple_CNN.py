@@ -1,6 +1,16 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import torchvision
+import torchvision.transforms as transforms
+
+from sklearn.metrics import precision_recall_fscore_support 
+from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score
+
+from tqdm import tqdm
+
 
 class SimpleCNN(nn.Module):
     def __init__(self, hidden_neurons, drop_rate):
@@ -33,3 +43,42 @@ class SimpleCNN(nn.Module):
         
         # activation funciton
         return F.log_softmax(x)
+
+def train_epoch(optimizer, model, trainloader, criterion):
+    running_loss = 0.0
+    for i, data in enumerate(tqdm(trainloader, 0)):
+        # get the inputs; data is a list of [inputs, labels]
+        inputs, labels = data
+
+        # zero the parameter gradients
+        optimizer.zero_grad()
+
+        # forward 
+        outputs = model(inputs)
+        # compute loss
+        loss = criterion(outputs, labels)
+        # pass gradients back
+        loss.backward()
+        # update parameters
+        optimizer.step()
+        preds = torch.argmax(outputs, axis=1)
+
+        metrics_list = precision_recall_fscore_support(preds, labels, average='macro')
+
+    return loss.item(), metrics_list[0], metrics_list[1], metrics_list[2]
+
+def predict_test(model, testloader):
+
+    # Test the network and print the classification report
+    true_labels = []
+    pred_labels = []
+
+    with torch.no_grad():
+        for data in testloader:
+            images, labels = data
+            outputs = model(images)
+            _, predicted = torch.max(outputs.data, 1)
+            true_labels += labels.tolist()
+            pred_labels += predicted.tolist()
+
+    return true_labels, pred_labels
