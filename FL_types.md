@@ -42,6 +42,8 @@ Based on
  - In general, this categorization does not provide different types of attacks, as it is mainly about the data layer of the model, and not about its characteristics.
  - However, Transfer Learning has some attacks in literature, though *not in the federated setting.*
  - [6]: Wang, S. et al. (2022) ‘Backdoor Attacks Against Transfer Learning With Pre-Trained Deep Learning Models’, IEEE Transactions on Services Computing, 15(3), pp. 1526–1539. Available at: https://doi.org/10.1109/TSC.2020.3000900. (#TODO): Read in depth
+ - Rezaei, S. and Liu, X. (2020) ‘A Target-Agnostic Attack on Deep Models: Exploiting Security Vulnerabilities of Transfer Learning’. arXiv. Available at: https://doi.org/10.48550/arXiv.1904.04334.
+
 
 ## By methods for solving heterogeneity
  - Because of the variety of devices that take part in the FL process, the difference of equipment will eventually affect the training. To solve the problem of system heterogeneity, the following architectures are implemented.
@@ -82,6 +84,7 @@ Based on
  - "Most privacy and robustness researches are focused on FL with homogeneous architectures. It remains unclear whether existing attacks, privacy-preserving techniques and defense mechanisms can be adapted to FL with heterogeneous architectures. It is valuable future work to explore similar types of attacks and defenses in heterogeneous FL." [11]
  - [11]: Lyu, L. et al. (2022) ‘Privacy and Robustness in Federated Learning: Attacks and Defenses’. arXiv. Available at: http://arxiv.org/abs/2012.06337 (Accessed: 20 January 2023).
 
+
 ### Peer to Peer FL
 
  - P2P FL is a distributed learning protocol without a central parameter server.
@@ -97,9 +100,6 @@ Based on
 
  #### Attacks
   - [18]: Yar, G., Nita-Rotaru, C. and Oprea, A. (2023) ‘Backdoor Attacks in Peer-to-Peer Federated Learning’. arXiv. Available at: https://doi.org/10.48550/arXiv.2301.09732.
-
-
-
 
 ## By data handling techniques
 
@@ -129,10 +129,11 @@ Based on
  - The difference between SL and FL lies in the communication content between clients
 and the server. In split learning, clients are responsible for training the shallower layers of the model, and update the outputs of shallower layers to the server.
  - [15] proposes a mix of FL and Split Learning
-- 
+  [16]
  - limited literature after 2018
 
 #### Literature explaining the model
  - didnt find the whitepaper or any other work from MIT explaining the details of the model
  - [MIT website for the paper](https://splitlearning.mit.edu/)
  - [15]: Thapa, C. et al. (2022) ‘SplitFed: When Federated Learning Meets Split Learning’. arXiv. Available at: http://arxiv.org/abs/2004.12088 (Accessed: 20 January 2023).
+ - [16]: Madaan, H., Kulkarni, M.G.V. and Pant, A. (2022) ‘Vulnerability Due to Training Order in Split Learning’, in M. Tuba, S. Akashe, and A. Joshi (eds) ICT Systems and Sustainability. Singapore: Springer Nature (Lecture Notes in Networks and Systems), pp. 103–112. Available at: https://doi.org/10.1007/978-981-16-5987-4_11.
