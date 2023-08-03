@@ -14,10 +14,6 @@ from update import LocalUpdate, test_inference
 from models import CNNMnist, CNNCifar
 from utils import get_dataset, average_weights, exp_details
 
-# import warnings
-# warnings.filterwarnings("ignore")
-
-
 if __name__ == '__main__':
 
     n_train_epochs = 30
@@ -25,12 +21,12 @@ if __name__ == '__main__':
     n_total_clients = 500
 
 
-    mal_usr_percentage = 0.0
+    mal_usr_percentage = 0
     target_hon = 3
     target_mal = 8
 
-    dataset = 'mnist'
-    # dataset = 'cifar'
+    # dataset = 'mnist'
+    dataset = 'cifar'
 
 
     args = args_parser()
@@ -68,7 +64,7 @@ if __name__ == '__main__':
     test_accuracy = []
     test_recall = []
     
-    for epoch in tqdm(range(15)):
+    for epoch in tqdm(range(30)):
         local_weights, local_losses = [], []
         
         global_model.train()
@@ -105,13 +101,13 @@ if __name__ == '__main__':
             
             list_acc.append(acc)
             list_loss.append(loss)
-            # list_rec.append(rec)
+            list_rec.append(rec)
             
         train_acc = sum(list_acc) / len(selected_users)
-        # train_rec = sum(list_rec) / n_total_clients
+        train_rec = sum(list_rec) / len(selected_users)
         
         train_accuracy.append(train_acc)
-        # train_recall.append(train_rec)
+        train_recall.append(train_rec)
 
         print(f' \nAvg Training Stats after {epoch+1} global rounds:')
         print(f'Training Loss : {np.mean(np.array(train_loss))}')
@@ -153,4 +149,15 @@ if __name__ == '__main__':
     plt.plot(range(len(test_accuracy)), test_accuracy, label='Test Accuracy')
     plt.ylabel('SAccuracy')
     plt.xlabel('Epochs')
+    plt.legend()    
     plt.savefig('save/acc.png')
+    
+    # Plot Average Recall vs Communication rounds
+    plt.figure()
+    plt.title('Average Recall vs Communication rounds')
+    plt.plot(range(len(train_recall)), train_recall, label='Train Recall')
+    plt.plot(range(len(test_recall)), test_recall, label='Test Recall')
+    plt.ylabel('Recall')
+    plt.xlabel('Epochs')
+    plt.legend()    
+    plt.savefig('save/rec.png')

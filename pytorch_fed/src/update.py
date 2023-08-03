@@ -167,5 +167,5 @@ def test_inference(model, test_dataset):
     else:
         source_class_recall = 0
         
-    return accuracy, loss, source_class_recall
+    return accuracy, loss / len(test_loader), source_class_recall
 
