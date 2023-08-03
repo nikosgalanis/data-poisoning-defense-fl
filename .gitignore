@@ -1,3 +1,9 @@
 */data/
 */__pycache__/
 /.idea/
+pytorch_fed/env
+pytorch_fed/env/*
+pytorch_fed/env/*/*
+logs/*
+pytorch_fed/src/__pycache__
+data/
