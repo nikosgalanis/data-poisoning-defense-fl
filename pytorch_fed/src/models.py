@@ -14,14 +14,14 @@ class CNNMnist(nn.Module):
         self.conv1 = nn.Conv2d(1, 32, 3) # assuming input is grayscale image
         self.max_pool = nn.MaxPool2d(2, 2)
         self.flatten = nn.Flatten()
-        self.dropout = nn.Dropout(0.1)
+        # self.dropout = nn.Dropout(0.1)
         self.fc1 = nn.Linear(5408, 10) # output size needs to be calculated based on input size
 
     def forward(self, x):
         x = torch.relu(self.conv1(x))
         x = self.max_pool(x)
         x = self.flatten(x)
-        x = self.dropout(x)
+        # x = self.dropout(x)
         x = F.relu(self.fc1(x))
         return F.log_softmax(x, dim=1)
 

@@ -44,7 +44,7 @@ class LocalUpdate(object):
         clients_test = clients[int(0.85 * len(clients)):]
         
         train_loader = DataLoader(DatasetSplit(dataset, clients_train),
-                                 batch_size=self.args.local_bs, shuffle=True)
+                                 batch_size=self.args.local_bs, shuffle = True)
         
         validation_loader = DataLoader(DatasetSplit(dataset, clients_val),
                                  batch_size=int(len(clients_val) / 10), shuffle = False)
@@ -60,7 +60,7 @@ class LocalUpdate(object):
         epoch_loss = []
 
         # Set optimizer for the local updates
-        optimizer = torch.optim.SGD(model.parameters(), lr=self.args.lr, momentum=0.5)
+        optimizer = torch.optim.SGD(model.parameters(), lr=self.args.lr)
 
         for _ in range(self.args.local_ep):
             batch_loss = []
@@ -163,7 +163,7 @@ def test_inference(model, test_dataset):
     confusion_mat = confusion_matrix(all_labels, all_pred_labels)
     class_id = 3
     if np.sum(confusion_mat[class_id, :]) > 0:
-        source_class_recall = confusion_mat[class_id, class_id] / np.sum(confusion_mat[class_id, :])
+        source_class_recall = confusion_mat[class_id, class_id] / (np.sum(confusion_mat[class_id, :]) + 0.001)
     else:
         source_class_recall = 0
         
