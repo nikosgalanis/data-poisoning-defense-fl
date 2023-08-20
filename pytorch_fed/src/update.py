@@ -54,6 +54,34 @@ class LocalUpdate(object):
         
         return train_loader, validation_loader, test_loader
 
+    def fake_update_weights(self, model):
+        # Set mode to train model
+        model.train()
+        epoch_loss = []
+
+        # Set optimizer for the local updates
+        optimizer = torch.optim.SGD(model.parameters(), lr=self.args.lr)
+
+        for _ in range(self.args.local_ep):
+            batch_loss = []
+            
+            for _, (images, labels) in enumerate(self.train_loader):
+                
+                images, labels = images.to(self.device), labels.to(self.device)
+
+                model.zero_grad()
+                log_probs = model(images)
+                loss = self.criterion(log_probs, labels)
+                loss.backward()
+                # optimizer.step()
+
+                batch_loss.append(loss.item())
+            
+            e_loss = sum(batch_loss) / len(self.train_loader)
+            epoch_loss.append(e_loss)
+
+        return model.state_dict(), sum(epoch_loss) / self.args.local_ep
+
     def update_weights(self, model):
         # Set mode to train model
         model.train()
@@ -81,6 +109,7 @@ class LocalUpdate(object):
             epoch_loss.append(e_loss)
 
         return model.state_dict(), sum(epoch_loss) / self.args.local_ep
+
 
     def inference(self, model):
         """ Returns the inference accuracy and loss.

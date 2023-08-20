@@ -12,11 +12,11 @@ import torch
 from options import args_parser
 from update import LocalUpdate, test_inference
 from models import CNNMnist, CNNCifar
-from utils import get_dataset, average_weights, exp_details
+from utils import get_dataset, average_weights, exp_details, find_largest_diff_index
 
 if __name__ == '__main__':
 
-    n_train_epochs = 30
+    n_train_epochs = 20
     n_train_clients = 50
     n_total_clients = 500
 
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     # load dataset and user groups
 
-    train_dataset, test_dataset, user_groups = get_dataset(args, mal_usr_percentage / 100, target_hon, target_mal)
+    train_dataset, test_dataset, user_groups, attackers = get_dataset(args, mal_usr_percentage / 100, target_hon, target_mal)
 
     # Training
     
@@ -70,11 +70,11 @@ if __name__ == '__main__':
     #     'model': global_model,
     # }, 'mnist.pth')
 
-    mal = [0, 10, 20, 40, 50]
+    mal = [0, 10, 20, 30, 40]
     
     for mal_usr_percentage in mal:
     
-        train_dataset, _, user_groups = get_dataset(args, mal_usr_percentage / 100, target_hon, target_mal)
+        train_dataset, _, user_groups, attackers = get_dataset(args, mal_usr_percentage / 100, target_hon, target_mal)
 
         checkpoint = torch.load('mnist.pth')
         global_model = checkpoint['model']
@@ -101,7 +101,7 @@ if __name__ == '__main__':
         test_recall = []
 
         for epoch in tqdm(range(n_train_epochs)):
-            local_weights, local_losses = [], []
+            local_weights_fake, local_losses_fake = [], []
             
             global_model.train()
         
@@ -111,12 +111,61 @@ if __name__ == '__main__':
             for user in selected_users:
                 local_model = LocalUpdate(args=args, dataset=train_dataset, clients=user_groups[user])
 
+                w, loss = local_model.fake_update_weights(
+                    model=copy.deepcopy(global_model))
+                
+                local_weights_fake.append(copy.deepcopy(w))
+                local_losses_fake.append(copy.deepcopy(loss))
+
+            sorted_indices = sorted(range(len(selected_users)), key=lambda k: local_losses_fake[k])
+
+
+            local_losses_fake = [local_losses_fake[i] for i in sorted_indices]
+            local_weights_fake = [local_weights_fake[i] for i in sorted_indices]
+            selected_users = [selected_users[i] for i in sorted_indices]
+
+
+            # print("algo")
+            # print(sorted(selected_users))
+            # if epoch == 2:
+            #     print(local_losses_fake)
+
+            # idx = int((1 - mal_usr_percentage / 100) * n_train_clients)
+            # idx = find_largest_diff_index(local_losses_fake[int(n_train_clients / 2):])
+            # idx += int((n_train_clients / 2) - 1)
+            
+            
+            idx = int((n_train_clients / 2))
+            
+            print(idx)
+            local_weights_fake = local_weights_fake[:idx]
+            local_losses_fake = local_losses_fake[:idx]
+            
+            attackers_found = selected_users[idx:]
+            selected_users = selected_users[:idx]
+    
+            
+            count = sum(1 for item in attackers_found if item in attackers)
+            
+            print("attackers found: " + str(count) + " out of" + str(mal_usr_percentage/ 100 * n_train_clients))
+            # print(count)
+            # print(" out of" + str(attackers))
+
+            # print(attackers)
+            # print(attackers_found)
+            
+            local_weights, local_losses = [], []
+
+            for user in selected_users:
+                local_model = LocalUpdate(args=args, dataset=train_dataset, clients=user_groups[user])
+
                 w, loss = local_model.update_weights(
                     model=copy.deepcopy(global_model))
                 
                 local_weights.append(copy.deepcopy(w))
                 local_losses.append(copy.deepcopy(loss))
-
+            
+            
             loss_avg = sum(local_losses) / len(selected_users)
             
             train_loss_total.append(loss_avg)
@@ -167,8 +216,8 @@ if __name__ == '__main__':
         test_recall_total.append(test_recall)
 
 
-        print(train_accuracy_total)
-        print(test_accuracy_total)
+        # print(train_accuracy_total)
+        # print(test_accuracy_total)
 
         print(f' \n Results after {args.epochs} global rounds of training:')
         print("|---- Avg Train Accuracy: {:.2f}%".format(100 * train_accuracy_total[-1][-1]))
