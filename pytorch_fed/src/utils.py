@@ -6,6 +6,11 @@ import copy
 import torch
 from torchvision import datasets, transforms
 from sampling import split_dataset
+import numpy as np
+from sklearn.cluster import KMeans
+
+import warnings
+warnings.filterwarnings("ignore")
 
 def get_dataset(args, mal_usr_percentage, target_hon, target_mal):
     """ Returns train and test datasets and a user group which is a dict where
@@ -91,3 +96,88 @@ def find_largest_diff_index(nums):
 
     return idx
 
+def eliminate_fixed_percentage(info,n_train_clients, percentage):
+    
+    (local_losses, local_weights, selected_users) = info
+    
+    sorted_indices = sorted(range(len(selected_users)), key=lambda k: local_losses[k])
+
+    local_losses = [local_losses[i] for i in sorted_indices]
+    local_weights = [local_weights[i] for i in sorted_indices]
+    selected_users = [selected_users[i] for i in sorted_indices]
+
+    idx = int((1 - percentage) * n_train_clients)
+    
+    attackers = selected_users[idx:]
+    selected_users = selected_users[:idx]
+
+    
+    return selected_users, attackers
+
+def eliminate_largest_diff(info, n_train_clients):
+    
+    (local_losses, local_weights, selected_users) = info
+    
+    sorted_indices = sorted(range(len(selected_users)), key=lambda k: local_losses[k])
+
+    local_losses = [local_losses[i] for i in sorted_indices]
+    local_weights = [local_weights[i] for i in sorted_indices]
+    selected_users = [selected_users[i] for i in sorted_indices]
+
+    idx = find_largest_diff_index(local_losses[int(n_train_clients / 3):])
+    idx += int((n_train_clients / 3) - 1)
+
+    attackers = selected_users[idx:]
+    
+    selected_users = selected_users[:idx]
+    
+    return selected_users, attackers
+
+def eliminate_with_z_score(info, threshold):
+    (local_losses, local_weights, selected_users) = info
+    
+    sorted_indices = sorted(range(len(selected_users)), key=lambda k: local_losses[k])
+
+    local_losses = [local_losses[i] for i in sorted_indices]
+    local_weights = [local_weights[i] for i in sorted_indices]
+    selected_users = [selected_users[i] for i in sorted_indices]
+    
+    mean = np.mean(local_losses)
+    std = np.std(local_losses)
+    z_scores = [(loss - mean) / std for loss in local_losses]
+    
+    attackers = np.where(np.abs(z_scores) > threshold)[0]
+    
+    selected_users_new = [selected_users[i] for i in range(len(selected_users)) if i not in attackers]
+    
+    return selected_users_new, attackers
+
+def eliminate_kmeans(info):
+    (local_losses, local_weights, selected_users) = info
+    data = np.array(local_losses).reshape(-1, 1)
+    # Apply KMeans clustering with 2 clusters
+    kmeans = KMeans(n_clusters=2)
+    kmeans.fit(data)
+    # Get cluster assignments and centroids
+    labels = kmeans.labels_
+    centroids = kmeans.cluster_centers_
+    # We assume the cluster with the higher centroid value corresponds to attackers.
+    # This is because attackers might have higher loss values than honest clients.
+    attacker_cluster = np.argmax(centroids)
+    # Get the indices of the attacker cluster
+    attackers = np.where(labels == attacker_cluster)[0]
+    selected_users_new = [selected_users[i] for i in range(len(selected_users)) if i not in attackers]
+    
+    return selected_users_new, attackers
+
+def apply_ldp(losses, epsilon, sensitivity=0.001):
+    # Compute the scale of the Laplace noise
+    b = sensitivity / epsilon
+
+    # Generate Laplace noise for each data point
+    noise = np.random.laplace(0, b, len(losses))
+
+    # Add the noise to the original data
+    noisy_data = losses + noise
+
+    return noisy_data
