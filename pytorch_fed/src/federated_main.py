@@ -73,10 +73,10 @@ if __name__ == '__main__':
     # torch.save({
     #     'model': global_model,
     # }, 'mnist.pth')
-    attack = [1]
+    attack = [0, 1]
     recalls = []
     recalls_fake = [0.8306922468393596, 0.8207912665433005, 0.7306923458491625, 0.6376231310662068]
-
+    recalls_true = [0.88, 0.87, 0.85, 0.78, 0.64]
 
     mal = [0, 10, 20, 30, 40]
     
@@ -130,7 +130,7 @@ if __name__ == '__main__':
                     
                     info = (local_losses_fake, local_weights_fake, selected_users)
                     
-                    selected_users, attackers_found = eliminate_fixed_percentage(info, n_train_clients, 0.7)
+                    selected_users, attackers_found = eliminate_largest_diff(info, n_train_clients)
                                 
                     count = sum(1 for item in attackers_found if item in attackers and item in selected_users)
                     if mal_usr_percentage > 0:
@@ -214,16 +214,16 @@ if __name__ == '__main__':
     matplotlib.use('Agg')
 
 
-    # epochs = [x for x in range(0, n_train_epochs)]
-    # for cnt, model_rec in enumerate(test_recall_total):
+    epochs = [x for x in range(0, n_train_epochs)]
+    for cnt, model_rec in enumerate(test_recall_total):
 
-    #     plt.plot(epochs, model_rec, label = str(mal[cnt]) + "% of mal users")
+        plt.plot(epochs, model_rec, label = str(mal[cnt]) + "% of mal users")
 
 
-    # plt.xlabel("Epochs")
-    # plt.ylabel("Source Class Recall")
-    # plt.legend()
-    # plt.savefig('save/rec_many_fix_percentage.png')
+    plt.xlabel("Epochs")
+    plt.ylabel("Source Class Recall")
+    plt.legend()
+    plt.savefig('save/rec_many_largest_diff.png')
 
 
 
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     plt.xlabel("Epochs")
     plt.ylabel("CrossEntropy Loss")
     plt.legend()
-    plt.savefig('save/loss_many_fix_percentage.png')
+    plt.savefig('save/loss_many_largest_diff.png')
 
 
     plt.figure()
@@ -250,7 +250,7 @@ if __name__ == '__main__':
     plt.xlabel("Epochs")
     plt.ylabel("Sparse Categorical Accuracy")
     plt.legend()
-    plt.savefig('save/accs_many_fix_percentage.png')
+    plt.savefig('save/accs_many_largest_diff.png')
 
     
     
@@ -260,34 +260,34 @@ if __name__ == '__main__':
     plt.xlabel("Malicious users %")
     plt.ylabel("Percentage of attackers detected")
     plt.legend()
-    plt.savefig('save/attackers_fix_percentage.png')
+    plt.savefig('save/attackers_largest_diff.png')
 
 
 
-    print(recalls[0][1:])
+    # print(recalls[0][1:])
 
-    # plt.figure()
-    # # Bar width
-    # bar_width = 0.35
+    plt.figure()
+    # Bar width
+    bar_width = 0.35
 
-    # # Positions of bars
-    # r1 = np.arange(len(mal[1:]))
-    # r2 = [x + bar_width for x in r1]
+    # Positions of bars
+    r1 = np.arange(len(mal[1:]))
+    r2 = [x + bar_width for x in r1]
 
-    # plt.bar(r1, recalls[1][1:], width=bar_width, edgecolor='grey', label='With Defense')
-    # plt.bar(r2, recalls[0][1:], width=bar_width, edgecolor='grey', label='Without Defense')
+    plt.bar(r1, recalls[0][1:], width=bar_width, edgecolor='grey', label='With Defense')
+    plt.bar(r2, recalls_fake, width=bar_width, edgecolor='grey', label='Without Defense')
 
-    # # Title & Subtitle
-    # plt.title('Effect of Defense Mechanism on Source Class Recall in Poisoning Attacks in FL')
-    # plt.xlabel('Malicious Users Percentage', fontweight='bold')
-    # plt.ylabel('Source Class Recall', fontweight='bold')
+    # Title & Subtitle
+    plt.title('Effect of Defense Mechanism on Source Class Recall in Poisoning Attacks in FL')
+    plt.xlabel('Malicious Users Percentage', fontweight='bold')
+    plt.ylabel('Source Class Recall', fontweight='bold')
 
-    # # x axis
-    # plt.xticks([r + bar_width for r in range(len(recalls[0][1:]))], mal[1:])
+    # x axis
+    plt.xticks([r + bar_width for r in range(len(recalls[0][1:]))], mal[1:])
 
-    # # Create legend & Show graphic
-    # plt.legend()
-    # plt.savefig('save/comparison_fix_percentage.png')
+    # Create legend & Show graphic
+    plt.legend()
+    plt.savefig('save/comparison_largest_diff.png')
     
     # # # Plot Average Accuracy vs Communication rounds
     # plt.figure()

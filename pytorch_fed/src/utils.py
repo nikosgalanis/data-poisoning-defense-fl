@@ -124,8 +124,8 @@ def eliminate_largest_diff(info, n_train_clients):
     local_weights = [local_weights[i] for i in sorted_indices]
     selected_users = [selected_users[i] for i in sorted_indices]
 
-    idx = find_largest_diff_index(local_losses[int(n_train_clients / 3):])
-    idx += int((n_train_clients / 3) - 1)
+    idx = find_largest_diff_index(local_losses[int(n_train_clients / 2):])
+    idx += int((n_train_clients / 2) - 1)
 
     attackers = selected_users[idx:]
     
