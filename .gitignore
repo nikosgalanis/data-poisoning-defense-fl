@@ -1,9 +1,9 @@
 */data/
 */__pycache__/
 /.idea/
-pytorch_fed/env
-pytorch_fed/env/*
-pytorch_fed/env/*/*
+DefenseFederated/env
+DefenseFederated/env/*
+DefenseFederated/env/*/*
 logs/*
-pytorch_fed/src/__pycache__
+DefenseFederated/src/__pycache__
 data/

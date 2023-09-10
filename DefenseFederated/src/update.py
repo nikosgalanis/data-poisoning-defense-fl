@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# Python version: 3.6
-
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
@@ -9,9 +5,6 @@ from sklearn.metrics import confusion_matrix
 import numpy as np
 
 class DatasetSplit(Dataset):
-    """An abstract Dataset class wrapped around Pytorch Dataset class.
-    """
-
     def __init__(self, dataset, clients):
         self.dataset = dataset
         self.clients = clients
@@ -24,27 +17,22 @@ class DatasetSplit(Dataset):
         return image, label
 
 class LocalUpdate(object):
-    def __init__(self, args, dataset, clients):
-        self.args = args
+    def __init__(self, dataset, clients):
         self.train_loader, self.validation_loader, self.test_loader = self.train_val_test(
             dataset, list(clients))
         
-        self.device = 'cuda' if args.gpu else 'cpu'
+        self.device = 'cuda'
         # Default criterion set to NLL loss function
         self.criterion = nn.NLLLoss().to(self.device)
 
     def train_val_test(self, dataset, clients):
-        """
-        Returns train, validation and test dataloaders for a given dataset
-        and user indexes.
-        """
         # split indexes for train, validation, and test (75, 10, 15)
         clients_train = clients[0 : int(0.75 * len(clients))]
         clients_val = clients[int(0.75 * len(clients)) : int(0.85 * len(clients))]
         clients_test = clients[int(0.85 * len(clients)):]
         
         train_loader = DataLoader(DatasetSplit(dataset, clients_train),
-                                 batch_size=self.args.local_bs, shuffle = True)
+                                 batch_size=10, shuffle = True)
         
         validation_loader = DataLoader(DatasetSplit(dataset, clients_val),
                                  batch_size=int(len(clients_val) / 10), shuffle = False)
@@ -60,9 +48,9 @@ class LocalUpdate(object):
         epoch_loss = []
 
         # Set optimizer for the local updates
-        optimizer = torch.optim.SGD(model.parameters(), lr=self.args.lr)
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
-        for _ in range(self.args.local_ep):
+        for _ in range(10):
             batch_loss = []
             
             for _, (images, labels) in enumerate(self.train_loader):
@@ -80,7 +68,7 @@ class LocalUpdate(object):
             e_loss = sum(batch_loss) / len(self.train_loader)
             epoch_loss.append(e_loss)
 
-        return model.state_dict(), sum(epoch_loss) / self.args.local_ep
+        return model.state_dict(), sum(epoch_loss) / 10
 
     def update_weights(self, model):
         # Set mode to train model
@@ -88,9 +76,9 @@ class LocalUpdate(object):
         epoch_loss = []
 
         # Set optimizer for the local updates
-        optimizer = torch.optim.SGD(model.parameters(), lr=self.args.lr)
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
-        for _ in range(self.args.local_ep):
+        for _ in range(10):
             batch_loss = []
             
             for _, (images, labels) in enumerate(self.train_loader):
@@ -108,13 +96,10 @@ class LocalUpdate(object):
             e_loss = sum(batch_loss) / len(self.train_loader)
             epoch_loss.append(e_loss)
 
-        return model.state_dict(), sum(epoch_loss) / self.args.local_ep
+        return model.state_dict(), sum(epoch_loss) / 10
 
 
     def inference(self, model):
-        """ Returns the inference accuracy and loss.
-        """
-
         model.eval()
         loss, total, correct = 0.0, 0.0, 0.0
 
@@ -153,9 +138,6 @@ class LocalUpdate(object):
 
 
 def test_inference(model, test_dataset):
-    """ Returns the test accuracy and loss.
-    """
-
     model.eval()
     loss, total, correct = 0.0, 0.0, 0.0
 

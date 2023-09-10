@@ -1,17 +1,11 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# Python version: 3.6
-
-
 import copy
 import numpy as np
 from tqdm import tqdm
 
 import torch
 
-from options import args_parser
 from update import LocalUpdate, test_inference
-from models import CNNMnist, CNNCifar
+from models import CNNMnist
 from utils import *
 
 import warnings
@@ -31,28 +25,18 @@ if __name__ == '__main__':
     target_mal = 8
 
     dataset = 'mnist'
-    # dataset = 'cifar'
 
-
-    args = args_parser()
-    exp_details(args)
-
-    args.num_users = n_total_clients
     
-    if args.gpu:
-        torch.cuda.set_device(int(args.gpu))
-    device = 'cuda' if args.gpu else 'cpu'
+    torch.cuda.set_device(0)
+    device = 'cuda'
 
     # load dataset and user groups
-
-    train_dataset, test_dataset, user_groups, attackers = get_dataset(args, mal_usr_percentage / 100, target_hon, target_mal)
+    train_dataset, test_dataset, user_groups, attackers = get_dataset(mal_usr_percentage / 100, target_hon, target_mal, n_total_clients)
 
     # Training
-    
     clients = []
     for i in range(n_train_epochs):
         clients.append(np.random.choice(range(n_total_clients), n_train_clients, replace=False))
-        # clients.append(range(n_total_clients)[:n_train_clients])
 
     train_loss_total = []
     train_accuracy_total = []
@@ -65,9 +49,7 @@ if __name__ == '__main__':
     attacker_detection_ratio = []
 
     # if dataset == 'mnist':
-    #     global_model = CNNMnist(args=args)
-    # elif dataset == 'cifar':
-    #     global_model = CNNCifar(args=args)
+    #     global_model = CNNMnist()
 
     # # Saving:
     # torch.save({
@@ -75,8 +57,6 @@ if __name__ == '__main__':
     # }, 'mnist.pth')
     attack = [0, 1]
     recalls = []
-    recalls_fake = [0.8306922468393596, 0.8207912665433005, 0.7306923458491625, 0.6376231310662068]
-    recalls_true = [0.88, 0.87, 0.85, 0.78, 0.64]
 
     mal = [0, 10, 20, 30, 40]
     
@@ -85,16 +65,15 @@ if __name__ == '__main__':
 
         for mal_usr_percentage in mal:
             
-            train_dataset, _, user_groups, attackers = get_dataset(args, mal_usr_percentage / 100, target_hon, target_mal)
+            train_dataset, _, user_groups, attackers = get_dataset(mal_usr_percentage / 100, target_hon, target_mal, n_total_clients)
 
             checkpoint = torch.load('mnist.pth')
             global_model = checkpoint['model']
             global_model.load_state_dict(global_model.state_dict())
 
-
             attack_ratio = 0
             
-            print(mal_usr_percentage)
+            print("Running experiment with " + str(mal_usr_percentage) + "% malicious clients")
 
             # Send the model to the device and then set it to train mode
             global_model.to(device)
@@ -115,9 +94,8 @@ if __name__ == '__main__':
                 
                     selected_users = clients[epoch]
 
-
                     for user in selected_users:
-                        local_model = LocalUpdate(args=args, dataset=train_dataset, clients=user_groups[user])
+                        local_model = LocalUpdate(dataset=train_dataset, clients=user_groups[user])
 
                         w, loss = local_model.fake_update_weights(
                             model=copy.deepcopy(global_model))
@@ -132,26 +110,24 @@ if __name__ == '__main__':
                     
                     selected_users, attackers_found = eliminate_largest_diff(info, n_train_clients)
                                 
-                    count = sum(1 for item in attackers_found if item in attackers and item in selected_users)
+                    count = sum(1 for item in attackers_found if item in attackers)
+                    
                     if mal_usr_percentage > 0:
-                        attack_ratio += (count / (mal_usr_percentage / 100 * n_train_clients))
+                        attack_ratio += (count / ((mal_usr_percentage / 100) * n_train_clients))
                                 
-
                 elif att == 0:
                     selected_users = clients[epoch]
-                    
                     
                 local_weights, local_losses = [], []
                 
                 for user in selected_users:
-                    local_model = LocalUpdate(args=args, dataset=train_dataset, clients=user_groups[user])
+                    local_model = LocalUpdate(dataset=train_dataset, clients=user_groups[user])
 
                     w, loss = local_model.update_weights(
                         model=copy.deepcopy(global_model))
                     
                     local_weights.append(copy.deepcopy(w))
                     local_losses.append(copy.deepcopy(loss))
-                
                 
                 loss_avg = sum(local_losses) / len(selected_users)
                 
@@ -168,9 +144,8 @@ if __name__ == '__main__':
                 # evaluation mode of the model
                 global_model.eval()
 
-
                 for client in selected_users:
-                    local_model = LocalUpdate(args = args, dataset = train_dataset, clients = user_groups[client])
+                    local_model = LocalUpdate(dataset = train_dataset, clients = user_groups[client])
                     
                     acc, loss, rec = local_model.inference(model = global_model)
                     train_acc += acc
@@ -193,7 +168,10 @@ if __name__ == '__main__':
             last_epoch_recall.append(test_recall[-1])
             
             if att == 1:
-                attacker_detection_ratio.append(attack_ratio / n_train_epochs)
+                attack_ratio /= n_train_epochs
+                if attack_ratio > 1:
+                    attack_ratio = 1
+                attacker_detection_ratio.append(attack_ratio)
                 train_accuracy_total.append(train_accuracy)
                 train_loss_total.append(train_loss)
                 train_recall_total.append(train_recall)
@@ -202,13 +180,8 @@ if __name__ == '__main__':
                 test_loss_total.append(test_loss)
                 test_recall_total.append(test_recall)
 
-            # print(f' \n Results after {args.epochs} global rounds of training:')
-            # print("|---- Avg Train Accuracy: {:.2f}%".format(100 * train_accuracy_total[-1][-1]))
-            # print("|---- Test Accuracy: {:.2f}%".format(100 * test_accuracy_total[-1][-1]))
-
         recalls.append(last_epoch_recall)
     
-    # PLOTTING (optional)
     import matplotlib
     import matplotlib.pyplot as plt
     matplotlib.use('Agg')
@@ -263,38 +236,20 @@ if __name__ == '__main__':
     plt.savefig('save/attackers_largest_diff.png')
 
 
-
-    # print(recalls[0][1:])
-
     plt.figure()
-    # Bar width
     bar_width = 0.35
 
-    # Positions of bars
     r1 = np.arange(len(mal[1:]))
     r2 = [x + bar_width for x in r1]
 
     plt.bar(r1, recalls[0][1:], width=bar_width, edgecolor='grey', label='With Defense')
-    plt.bar(r2, recalls_fake, width=bar_width, edgecolor='grey', label='Without Defense')
+    plt.bar(r2, recalls[1][1:], width=bar_width, edgecolor='grey', label='Without Defense')
 
-    # Title & Subtitle
     plt.title('Effect of Defense Mechanism on Source Class Recall in Poisoning Attacks in FL')
     plt.xlabel('Malicious Users Percentage', fontweight='bold')
     plt.ylabel('Source Class Recall', fontweight='bold')
 
-    # x axis
     plt.xticks([r + bar_width for r in range(len(recalls[0][1:]))], mal[1:])
 
-    # Create legend & Show graphic
     plt.legend()
     plt.savefig('save/comparison_largest_diff.png')
-    
-    # # # Plot Average Accuracy vs Communication rounds
-    # plt.figure()
-    # plt.title('Average Accuracy vs Communication rounds')
-    # plt.plot(range(len(train_accuracy_total[0])), train_accuracy_total[0], label='Train Accuracy')
-    # plt.plot(range(len(test_accuracy_total[0])), test_accuracy_total[0], label='Test Accuracy')
-    # plt.ylabel('Accuracy')
-    # plt.xlabel('Epochs')
-    # plt.legend()    
-    # plt.savefig('save/acc.png')
