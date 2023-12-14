@@ -42,7 +42,8 @@ class LocalUpdate(object):
         
         return train_loader, validation_loader, test_loader
 
-    def fake_update_weights(self, model):
+    def update_weights(self, model, fake=False):
+        local_epochs = 50
         # Set mode to train model
         model.train()
         epoch_loss = []
@@ -50,53 +51,32 @@ class LocalUpdate(object):
         # Set optimizer for the local updates
         optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
-        for _ in range(10):
+        for _ in range(local_epochs):
             batch_loss = []
             
             for _, (images, labels) in enumerate(self.train_loader):
                 
+                # transfer the tensors to the appropriate device
                 images, labels = images.to(self.device), labels.to(self.device)
 
                 model.zero_grad()
                 log_probs = model(images)
                 loss = self.criterion(log_probs, labels)
                 loss.backward()
-                # optimizer.step()
+
+                # in the case of a fake update, we want the loss but
+                # we don't want the optimizer to proceed
+                if fake == False:
+                    optimizer.step()
 
                 batch_loss.append(loss.item())
             
+            # compute the epoch loss and append it
             e_loss = sum(batch_loss) / len(self.train_loader)
             epoch_loss.append(e_loss)
 
-        return model.state_dict(), sum(epoch_loss) / 10
-
-    def update_weights(self, model):
-        # Set mode to train model
-        model.train()
-        epoch_loss = []
-
-        # Set optimizer for the local updates
-        optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
-
-        for _ in range(10):
-            batch_loss = []
-            
-            for _, (images, labels) in enumerate(self.train_loader):
-                
-                images, labels = images.to(self.device), labels.to(self.device)
-
-                model.zero_grad()
-                log_probs = model(images)
-                loss = self.criterion(log_probs, labels)
-                loss.backward()
-                optimizer.step()
-
-                batch_loss.append(loss.item())
-            
-            e_loss = sum(batch_loss) / len(self.train_loader)
-            epoch_loss.append(e_loss)
-
-        return model.state_dict(), sum(epoch_loss) / 10
+        # return the state of the model, together with the total loss
+        return model.state_dict(), sum(epoch_loss) / local_epochs
 
 
     def inference(self, model):

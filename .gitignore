@@ -7,3 +7,4 @@ DefenseFederated/env/*/*
 logs/*
 DefenseFederated/src/__pycache__
 data/
+.venv
