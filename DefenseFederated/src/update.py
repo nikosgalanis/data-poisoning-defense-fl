@@ -42,14 +42,14 @@ class LocalUpdate(object):
         
         return train_loader, validation_loader, test_loader
 
-    def update_weights(self, model, fake=False):
+    def update_weights(self, model, local_epochs, learning_rate, fake=False):
         local_epochs = 50
         # Set mode to train model
         model.train()
         epoch_loss = []
 
         # Set optimizer for the local updates
-        optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+        optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
         for _ in range(local_epochs):
             batch_loss = []

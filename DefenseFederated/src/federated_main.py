@@ -25,8 +25,9 @@ if __name__ == '__main__':
     target_mal = 8
 
     dataset = 'mnist'
+    client_lr = 0.01
+    client_epochs = 10
 
-    
     torch.cuda.set_device(0)
     device = 'cuda'
 
@@ -97,8 +98,8 @@ if __name__ == '__main__':
                     for user in selected_users:
                         local_model = LocalUpdate(dataset=train_dataset, clients=user_groups[user])
 
-                        w, loss = local_model.fake_update_weights(
-                            model=copy.deepcopy(global_model))
+                        w, loss = local_model.update_weights(
+                            model=copy.deepcopy(global_model), local_epochs=client_epochs, learning_rate=client_lr, fake=True)
                         
                         local_weights_fake.append(copy.deepcopy(w))
                         local_losses_fake.append(copy.deepcopy(loss))
@@ -124,7 +125,8 @@ if __name__ == '__main__':
                     local_model = LocalUpdate(dataset=train_dataset, clients=user_groups[user])
 
                     w, loss = local_model.update_weights(
-                        model=copy.deepcopy(global_model))
+                        model=copy.deepcopy(global_model), local_epochs=client_epochs, learning_rate=client_lr)
+
                     
                     local_weights.append(copy.deepcopy(w))
                     local_losses.append(copy.deepcopy(loss))
