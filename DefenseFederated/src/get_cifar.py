@@ -1,6 +1,5 @@
 from torchvision import datasets, transforms
 
-
 data_dir = '../data/cifar/'
 apply_transform = transforms.Compose(
     [transforms.ToTensor(),

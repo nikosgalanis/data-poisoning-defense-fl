@@ -21,7 +21,7 @@ class LocalUpdate(object):
         self.train_loader, self.validation_loader, self.test_loader = self.train_val_test(
             dataset, list(clients))
         
-        self.device = 'cuda'
+        self.device = 'cuda:0'
         # Default criterion set to NLL loss function
         self.criterion = nn.NLLLoss().to(self.device)
 
@@ -43,7 +43,6 @@ class LocalUpdate(object):
         return train_loader, validation_loader, test_loader
 
     def update_weights(self, model, local_epochs, learning_rate, fake=False):
-        local_epochs = 50
         # Set mode to train model
         model.train()
         epoch_loss = []
@@ -121,7 +120,7 @@ def test_inference(model, test_dataset):
     model.eval()
     loss, total, correct = 0.0, 0.0, 0.0
 
-    device = 'cuda'
+    device = 'cuda:0'
 
     criterion = nn.NLLLoss().to(device)
     test_loader = DataLoader(test_dataset, batch_size=128,
