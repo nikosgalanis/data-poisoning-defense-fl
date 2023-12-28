@@ -69,6 +69,28 @@ def find_largest_diff_index(nums):
 
     return idx
 
+def calculate_accuracy(actual, predicted, total_clients):
+    TP = len(set(actual) & set(predicted))
+    FP = len(set(predicted) - set(actual))
+    FN = len(set(actual) - set(predicted))
+    TN = len(set(total_clients) - set(actual) - set(predicted))
+
+    accuracy = (TP + TN) / (TP + TN + FP + FN) if (TP + TN + FP + FN) != 0 else 0
+    return accuracy
+
+def calculate_f1_score(actual, predicted):
+    TP = len(set(actual) & set(predicted))
+    FP = len(set(predicted) - set(actual))
+    FN = len(set(actual) - set(predicted))
+
+    precision = TP / (TP + FP) if (TP + FP) != 0 else 0
+    recall = TP / (TP + FN) if (TP + FN) != 0 else 0
+
+    if precision + recall == 0:
+        return 0
+    else:
+        return 2 * (precision * recall) / (precision + recall)
+
 def eliminate_fixed_percentage(info,n_train_clients, percentage):
     
     (local_losses, local_weights, selected_users) = info

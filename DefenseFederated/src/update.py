@@ -84,25 +84,26 @@ class LocalUpdate(object):
 
         all_labels = []
         all_pred_labels = []
-        for _, (images, labels) in enumerate(self.test_loader):
-            
-            images, labels = images.to(self.device), labels.to(self.device)
 
-            # Inference
-            outputs = model(images)
-            batch_loss = self.criterion(outputs, labels)
-            loss += batch_loss.item()
+        with torch.no_grad():
+            for _, (images, labels) in enumerate(self.test_loader):
+                images, labels = images.to(self.device), labels.to(self.device)
 
-            # Prediction
-            _, pred_labels = torch.max(outputs, 1)
-            pred_labels = pred_labels.view(-1)
-            correct += torch.sum(torch.eq(pred_labels, labels)).item()
-            total += len(labels)
+                # Inference
+                outputs = model(images)
+                batch_loss = self.criterion(outputs, labels)
+                loss += batch_loss.item()
 
-            # Append the batch results
-            all_labels.extend(labels.cpu().numpy())
-            all_pred_labels.extend(pred_labels.cpu().numpy())
-            
+                # Prediction
+                _, pred_labels = torch.max(outputs, 1)
+                pred_labels = pred_labels.view(-1)
+                correct += torch.sum(torch.eq(pred_labels, labels)).item()
+                total += len(labels)
+
+                # Append the batch results
+                all_labels.extend(labels.cpu().numpy())
+                all_pred_labels.extend(pred_labels.cpu().numpy())
+
         accuracy = correct / total
         
         # Compute the confusion matrix
@@ -123,35 +124,36 @@ def test_inference(model, test_dataset):
     device = 'cuda:0'
 
     criterion = nn.NLLLoss().to(device)
-    test_loader = DataLoader(test_dataset, batch_size=128,
+    test_loader = DataLoader(test_dataset, batch_size=64,
                             shuffle=False)
 
     all_labels = []
     all_pred_labels = []
     
-    for _, (images, labels) in enumerate(test_loader):
-        
-        images, labels = images.to(device), labels.to(device)
-        # Inference
-        outputs = model(images)
-        batch_loss = criterion(outputs, labels)
-        loss += batch_loss.item()
+    with torch.no_grad():
+        for _, (images, labels) in enumerate(test_loader):
+            images, labels = images.to(device), labels.to(device)
 
-        # Prediction
-        _, pred_labels = torch.max(outputs, 1)
-        pred_labels = pred_labels.view(-1)
-        correct += torch.sum(torch.eq(pred_labels, labels)).item()
-        total += len(labels)
+            # Inference
+            outputs = model(images)
+            batch_loss = criterion(outputs, labels)
+            loss += batch_loss.item()
 
-        # Append the batch results
-        all_labels.extend(labels.cpu().numpy())
-        all_pred_labels.extend(pred_labels.cpu().numpy())
+            # Prediction
+            _, pred_labels = torch.max(outputs, 1)
+            pred_labels = pred_labels.view(-1)
+            correct += torch.sum(torch.eq(pred_labels, labels)).item()
+            total += len(labels)
 
+            # Append the batch results
+            all_labels.extend(labels.cpu().numpy())
+            all_pred_labels.extend(pred_labels.cpu().numpy())
+            
     accuracy = correct / total
     
     # Compute the confusion matrix
     confusion_mat = confusion_matrix(all_labels, all_pred_labels)
-    class_id = 3
+    class_id = 4
     if np.sum(confusion_mat[class_id, :]) > 0:
         source_class_recall = confusion_mat[class_id, class_id] / (np.sum(confusion_mat[class_id, :]) + 0.001)
     else:
