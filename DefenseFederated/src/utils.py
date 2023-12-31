@@ -8,7 +8,7 @@ from sklearn.cluster import KMeans
 import warnings
 warnings.filterwarnings("ignore")
 
-def get_dataset(mal_usr_percentage, target_hon, target_mal, n_total_clients, dataset):
+def get_dataset(mal_usr_percentage, target_hon, target_mal, n_total_clients, n_train_clients, dataset):
     if dataset == 'mnist':
         data_dir = '../data/mnist/'
         apply_transform = transforms.Compose([
@@ -20,7 +20,7 @@ def get_dataset(mal_usr_percentage, target_hon, target_mal, n_total_clients, dat
 
         test_dataset = datasets.MNIST(data_dir, train = False, download = True, transform = apply_transform)
 
-        train_dataset, user_groups, attackers = split_dataset(train_dataset, n_total_clients, mal_usr_percentage, target_hon, target_mal)
+        train_dataset, user_groups, attackers = split_dataset(train_dataset, n_total_clients, n_train_clients, mal_usr_percentage, target_hon, target_mal)
     
     elif dataset == 'cifar':
         data_dir = '../data/cifar/'
@@ -41,7 +41,7 @@ def get_dataset(mal_usr_percentage, target_hon, target_mal, n_total_clients, dat
 
         test_dataset = datasets.CIFAR10(data_dir, train=False, download=True, transform=apply_transform)
 
-        train_dataset, user_groups, attackers = split_dataset(train_dataset, n_total_clients, mal_usr_percentage, target_hon, target_mal)
+        train_dataset, user_groups, attackers = split_dataset(train_dataset, n_total_clients, n_train_clients, mal_usr_percentage, target_hon, target_mal)
 
 
     return train_dataset, test_dataset, user_groups, attackers

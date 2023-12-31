@@ -117,7 +117,7 @@ class LocalUpdate(object):
         return accuracy, loss, source_class_recall  
 
 
-def test_inference(model, test_dataset):
+def test_inference(model, test_dataset, target_mal):
     model.eval()
     loss, total, correct = 0.0, 0.0, 0.0
 
@@ -153,7 +153,7 @@ def test_inference(model, test_dataset):
     
     # Compute the confusion matrix
     confusion_mat = confusion_matrix(all_labels, all_pred_labels)
-    class_id = 4
+    class_id = target_mal
     if np.sum(confusion_mat[class_id, :]) > 0:
         source_class_recall = confusion_mat[class_id, class_id] / (np.sum(confusion_mat[class_id, :]) + 0.001)
     else:
