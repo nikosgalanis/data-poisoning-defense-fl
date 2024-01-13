@@ -30,15 +30,14 @@ class LocalUpdate(object):
         clients_train = clients[0 : int(0.75 * len(clients))]
         clients_val = clients[int(0.75 * len(clients)) : int(0.85 * len(clients))]
         clients_test = clients[int(0.85 * len(clients)):]
-        
         train_loader = DataLoader(DatasetSplit(dataset, clients_train),
                                  batch_size=10, shuffle = True)
         
         validation_loader = DataLoader(DatasetSplit(dataset, clients_val),
-                                 batch_size=int(len(clients_val) / 10), shuffle = False)
+                                 batch_size=int(len(clients_val) / 2), shuffle = False)
         
         test_loader = DataLoader(DatasetSplit(dataset, clients_test),
-                                batch_size=int(len(clients_test) / 10), shuffle = False)
+                                batch_size=int(len(clients_test) / 2), shuffle = False)
         
         return train_loader, validation_loader, test_loader
 
@@ -124,7 +123,7 @@ def test_inference(model, test_dataset, target_mal):
     device = 'cuda:0'
 
     criterion = nn.NLLLoss().to(device)
-    test_loader = DataLoader(test_dataset, batch_size=64,
+    test_loader = DataLoader(test_dataset, batch_size=32,
                             shuffle=False)
 
     all_labels = []

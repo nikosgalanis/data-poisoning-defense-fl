@@ -5,8 +5,8 @@ def split_dataset(dataset, num_users, n_train_clients, mal_usr_percentage, targe
     dict_users = {}
     
     num_attackers = int(mal_usr_percentage * n_train_clients)
-    # attackers = set(range(num_attackers))  # First 'num_attackers' users are attackers
-    attackers = set(random.sample(range(n_train_clients), num_attackers))
+    attackers = set(range(num_attackers))  # First 'num_attackers' users are attackers
+    # attackers = set(random.sample(range(n_train_clients), num_attackers))
 
     new_dataset = {}
     
