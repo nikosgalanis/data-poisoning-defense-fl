@@ -21,8 +21,8 @@ Our solution utilizes a novel approach that leverages metadata, specifically the
 The repository is structured as follows:
 
 - `DefenseFederated`: Contains the main implementation of our defense mechanism.
-  - `checkpoint.pth`, `mnist.pth`: Pre-trained model checkpoints for quick experimentation.
-  - `experiments`: Directory containing visualizations of attackers' accuracy and F1 scores, alongside CIFAR and MNIST datasets' specific results.
+  - `models`: Pre-trained model checkpoints for quick experimentation.
+  - `results`: Directory containing visualizations of attackers' accuracy and F1 scores, alongside CIFAR and MNIST datasets' specific results.
   - `src`: Source code including the federated learning framework, model definitions, and utility scripts for data handling and experiment running.
 
 - `DefenseTraditionalML`: Notebooks and scripts demonstrating the application of our defense mechanism to traditional machine learning settings, showcasing its versatility.
