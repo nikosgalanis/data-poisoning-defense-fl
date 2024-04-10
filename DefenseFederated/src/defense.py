@@ -202,14 +202,3 @@ for att in attack:
                 attackers_f1_total.append(sum(attackers_f1) / len(attackers_f1))
                 print(attackers_accuracy)
                 print(attackers_f1)
-                
-    #         attacker_detection_ratio.append(attack_ratio)
-    #         train_accuracy_total.append(train_accuracy)
-    #         train_loss_total.append(train_loss)
-    #         train_recall_total.append(train_recall)
-
-    #         test_accuracy_total.append(test_accuracy)
-    #         test_loss_total.append(test_loss)
-    #         test_recall_total.append(test_recall)
-
-    # recalls.append(last_epoch_recall)

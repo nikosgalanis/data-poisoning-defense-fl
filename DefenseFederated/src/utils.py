@@ -29,13 +29,6 @@ def get_dataset(mal_usr_percentage, target_hon, target_mal, n_total_clients, n_t
              transforms.Normalize((0.4914, 0.4822, 0.4465), 
             (0.2023, 0.1994, 0.2010))])
 
-        # for alex model
-        # apply_transform = transforms.Compose([
-        # transforms.ToTensor(),
-        # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-            #  transforms.Normalize((0.5, 0.5, 0.5), 
-            # (0.5, 0.5, 0.5))])
-
         # split and define the train and test datasets
         train_dataset = datasets.CIFAR10(data_dir, train=True, download=True, transform=apply_transform)
 
