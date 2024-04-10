@@ -35,10 +35,12 @@ Below are some sample images from our experiments on the MNIST and CIFAR-10 data
 
 <img src="./DefenseFederated/results/attackers_detection_accuracy.png" alt="image alt text" width="333" height="250"> <img src="./DefenseFederated/results/attackers_detection_f1.png" alt="image alt text" width="333" height="250">
 
-This graph offers insights into how accurately our defense mechanism can identify and eliminate malicious users attempting to poison the model. A high performance in accuracy and F1 score in this tasks indicates a robust defense capability, while ensuring the integrity of the FL process.
+This graph offers insights into how accurately our defense mechanism can identify and eliminate malicious users attempting to poison the model. A high performance in accuracy and F1 score in this tasks indicates a robust defense capability, while ensuring the integrity of the FL process. Below, we can observe the difference the application of our defense makes to the model's performance, by presenting some metrics with and without the precense of this defense.
 
 
-<img src="./DefenseFederated/results/mnist/defending/accs_many_kmeans.png" alt="CIFAR Accuracy Comparison" width="333" height="250"> <img src="./DefenseFederated/results/mnist/defending/rec_many_kmeans.png" alt="MNIST Recall Improvement" width="333" height="250">
+<img src="./DefenseFederated/results/mnist/attacking/acc_attack_mnist.png" alt="CIFAR Accuracy Comparison" width="333" height="250"> <img src="./DefenseFederated/results/mnist/defending/accs_many_kmeans.png" alt="MNIST Recall Improvement" width="333" height="250">
+
+<img src="./DefenseFederated/results/mnist/attacking/recall_attack_mnist.png" alt="CIFAR Accuracy Comparison" width="333" height="250"> <img src="./DefenseFederated/results/mnist/defending/rec_many_kmeans.png" alt="MNIST Recall Improvement" width="333" height="250">
 
 
 This figure illustrates the improvement in 2 different metrics:
