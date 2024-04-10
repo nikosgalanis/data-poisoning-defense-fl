@@ -33,12 +33,12 @@ The repository is structured as follows:
 
 Below are some sample images from our experiments on the MNIST and CIFAR-10 datasets, illustrating the defense mechanism's effectiveness in maintaining model performance despite data poisoning attacks:
 
-<img src="./DefenseFederated/save/attackers_accuracy.png" alt="image alt text" width="333" height="250"> <img src="./DefenseFederated/save/attackers_f1.png" alt="image alt text" width="333" height="250">
+<img src="./DefenseFederated/results/attackers_detection_accuracy.png" alt="image alt text" width="333" height="250"> <img src="./DefenseFederated/results/attackers_detection_f1.png" alt="image alt text" width="333" height="250">
 
 This graph offers insights into how accurately our defense mechanism can identify and eliminate malicious users attempting to poison the model. A high performance in accuracy and F1 score in this tasks indicates a robust defense capability, while ensuring the integrity of the FL process.
 
 
-<img src="./DefenseFederated/save/cifar/acc_defense_cifar_kmeans.png" alt="CIFAR Accuracy Comparison" width="333" height="250"> <img src="./DefenseFederated/save/cifar/recall_defense_cifar_kmeans.png" alt="MNIST Recall Improvement" width="333" height="250">
+<img src="./DefenseFederated/results/mnist/defending/accs_many_kmeans.png" alt="CIFAR Accuracy Comparison" width="333" height="250"> <img src="./DefenseFederated/results/mnist/defending/rec_many_kmeans.png" alt="MNIST Recall Improvement" width="333" height="250">
 
 
 This figure illustrates the improvement in 2 different metrics:
