@@ -1,11 +1,13 @@
 import numpy as np
-
-def split_dataset(dataset, num_users, mal_usr_percentage, target_honest, target_mal):
+import random
+def split_dataset(dataset, num_users, n_train_clients, mal_usr_percentage, target_honest, target_mal):
     num_items = int(len(dataset) / num_users)
     dict_users = {}
     
-    num_attackers = int(mal_usr_percentage * num_users)
+    num_attackers = int(mal_usr_percentage * n_train_clients)
     attackers = set(range(num_attackers))  # First 'num_attackers' users are attackers
+    # attackers = set(random.sample(range(n_train_clients), num_attackers))
+
     new_dataset = {}
     
     for i in range(num_users):

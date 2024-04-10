@@ -8,18 +8,34 @@ from sklearn.cluster import KMeans
 import warnings
 warnings.filterwarnings("ignore")
 
-def get_dataset(mal_usr_percentage, target_hon, target_mal, n_total_clients):
-    data_dir = '../data/mnist/'
-    apply_transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))])
+def get_dataset(mal_usr_percentage, target_hon, target_mal, n_total_clients, n_train_clients, dataset):
+    if dataset == 'mnist':
+        data_dir = '../data/mnist/'
+        apply_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,))])
 
-    train_dataset = datasets.MNIST(data_dir, train = True, download = True, transform = apply_transform)
+        # split and define the train and test datasets
+        train_dataset = datasets.MNIST(data_dir, train = True, download = True, transform = apply_transform)
 
-    test_dataset = datasets.MNIST(data_dir, train = False, download = True, transform = apply_transform)
+        test_dataset = datasets.MNIST(data_dir, train = False, download = True, transform = apply_transform)
 
-    # sample training data amongst users
-    train_dataset, user_groups, attackers = split_dataset(train_dataset, n_total_clients, mal_usr_percentage, target_hon, target_mal)
+        train_dataset, user_groups, attackers = split_dataset(train_dataset, n_total_clients, n_train_clients, mal_usr_percentage, target_hon, target_mal)
+    
+    elif dataset == 'cifar':
+        data_dir = '../data/cifar/'
+        apply_transform = transforms.Compose(
+            [transforms.ToTensor(),
+             transforms.Normalize((0.4914, 0.4822, 0.4465), 
+            (0.2023, 0.1994, 0.2010))])
+
+        # split and define the train and test datasets
+        train_dataset = datasets.CIFAR10(data_dir, train=True, download=True, transform=apply_transform)
+
+        test_dataset = datasets.CIFAR10(data_dir, train=False, download=True, transform=apply_transform)
+
+        train_dataset, user_groups, attackers = split_dataset(train_dataset, n_total_clients, n_train_clients, mal_usr_percentage, target_hon, target_mal)
+
 
     return train_dataset, test_dataset, user_groups, attackers
 
@@ -45,6 +61,28 @@ def find_largest_diff_index(nums):
             idx = i
 
     return idx
+
+def calculate_accuracy(actual, predicted, total_clients):
+    TP = len(set(actual) & set(predicted))
+    FP = len(set(predicted) - set(actual))
+    FN = len(set(actual) - set(predicted))
+    TN = len(set(total_clients) - set(actual) - set(predicted))
+
+    accuracy = (TP + TN) / (TP + TN + FP + FN) if (TP + TN + FP + FN) != 0 else 0
+    return accuracy
+
+def calculate_f1_score(actual, predicted):
+    TP = len(set(actual) & set(predicted))
+    FP = len(set(predicted) - set(actual))
+    FN = len(set(actual) - set(predicted))
+
+    precision = TP / (TP + FP) if (TP + FP) != 0 else 0
+    recall = TP / (TP + FN) if (TP + FN) != 0 else 0
+
+    if precision + recall == 0:
+        return 0
+    else:
+        return 2 * (precision * recall) / (precision + recall)
 
 def eliminate_fixed_percentage(info,n_train_clients, percentage):
     
