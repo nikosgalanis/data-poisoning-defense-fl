@@ -1,6 +1,7 @@
 # Defense Against Data Poisoning Attacks in Federated Learning via User Elimination
 
-This repository contains the technical implementation of the paper (TODO), as well as proof of its results.
+This repository contains the technical implementation of the paper [Defending against Data Poisoning Attacks in Federated Learning via User Elimination](https://arxiv.org/pdf/2404.12778.pdf)
+, as well as proof of its results.
 
 ## Abstract
 
@@ -60,3 +61,6 @@ For detailed implementation and to replicate our experiments, refer to the `src`
 ## Aknowledgments
 
 This work was conducted as part of my Master's Dissertation for the MSc in Information Security at the University College London (UCL), with the help and guidance of my supervisor Prof Emiliano De Cristofaro (University of California, Riverside), and of Prof Lorenzo Cavallaro (UCL).
+
+
+[1]: H. Brendan McMahan et al. CommunicationEfficient Learning of Deep Networks from Decentralized Data. arXiv:1602.05629
